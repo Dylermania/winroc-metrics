@@ -1112,7 +1112,7 @@ class _BackupScreenState extends ConsumerState<_BackupScreen> {
       showSnack(context, 'Enter the password used when the backup was created.');
       return;
     }
-    final result = await FilePicker.platform.pickFiles(
+    final result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['wmb'],
     );

@@ -15,7 +15,7 @@ import '../../shared/widgets.dart';
 
 class MemberImportExport {
   static Future<int> importFromFile(BuildContext context, MemberDao dao) async {
-    final result = await FilePicker.platform.pickFiles(
+    final result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['csv', 'xlsx', 'xls'],
       withData: true,
