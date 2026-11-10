@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'data/daos/admin_dao.dart';
@@ -21,18 +22,26 @@ final currentUserProvider = StateProvider<User?>((ref) => null);
 
 final currentTermProvider = StreamProvider<Term?>((ref) {
   final db = ref.watch(databaseProvider);
-  return db.customSelect('SELECT * FROM terms WHERE is_current = 1 AND deleted_at IS NULL LIMIT 1',
-      readsFrom: {db.terms}).watch().map((rows) => rows.isEmpty
-      ? null
-      : Term.fromJson(rows.first.data));
+  return (db.select(db.terms)
+        ..where((t) => t.isCurrent.equals(true) & t.deletedAt.isNull())
+        ..limit(1))
+      .watchSingleOrNull();
 });
 
 final currentYearProvider = StreamProvider<AcademicYear?>((ref) {
   final db = ref.watch(databaseProvider);
-  return db.customSelect('SELECT * FROM academic_years WHERE is_current = 1 AND deleted_at IS NULL LIMIT 1',
-      readsFrom: {db.academicYears}).watch().map((rows) => rows.isEmpty
-      ? null
-      : AcademicYear.fromJson(rows.first.data));
+  return (db.select(db.academicYears)
+        ..where((y) => y.isCurrent.equals(true) & y.deletedAt.isNull())
+        ..limit(1))
+      .watchSingleOrNull();
+});
+
+final allTermsProvider = FutureProvider<List<Term>>((ref) {
+  final db = ref.watch(databaseProvider);
+  return (db.select(db.terms)
+        ..where((t) => t.deletedAt.isNull())
+        ..orderBy([(t) => OrderingTerm(expression: t.startDate, mode: OrderingMode.desc)]))
+      .get();
 });
 
 final themeModeProvider = StreamProvider<String>((ref) =>

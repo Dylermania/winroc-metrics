@@ -1,5 +1,5 @@
 #define MyAppName "Winroc Metrics"
-#define MyAppVersion "2.0.0"
+#define MyAppVersion "2.1.0"
 #define MyAppPublisher "Robotics Club, Winneba Secondary School"
 #define MyAppExeName "winroc_metrics.exe"
 

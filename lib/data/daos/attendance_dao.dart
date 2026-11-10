@@ -21,7 +21,14 @@ class AttendanceDao {
   final AppDatabase db;
   AttendanceDao(this.db);
 
-  Stream<List<Session>> watchSessions({String? termId, bool upcomingOnly = false}) {
+  Stream<List<Session>> watchSessions({String? termId, bool upcomingOnly = false}) =>
+      _sessionsQuery(termId: termId, upcomingOnly: upcomingOnly).watch();
+
+  Future<List<Session>> listSessions({String? termId, bool upcomingOnly = false}) =>
+      _sessionsQuery(termId: termId, upcomingOnly: upcomingOnly).get();
+
+  SimpleSelectStatement<$SessionsTable, Session> _sessionsQuery(
+      {String? termId, bool upcomingOnly = false}) {
     var q = db.select(db.sessions)..where((s) => s.deletedAt.isNull());
     if (termId != null) q = q..where((s) => s.termId.equals(termId));
     if (upcomingOnly) {
@@ -30,7 +37,7 @@ class AttendanceDao {
         ..where((s) => s.state.equalsValue(SessionState.closed).not());
     }
     q = q..orderBy([(s) => OrderingTerm(expression: s.date, mode: OrderingMode.desc)]);
-    return q.watch();
+    return q;
   }
 
   Future<Session?> get(String id) =>
@@ -306,6 +313,29 @@ class AttendanceDao {
       out.add((date: s.date, pct: pctFrom(records)));
     }
     return out;
+  }
+
+  Future<List<AttendanceRecord>> _recordsForTerm(String termId) async {
+    final sessions = await listSessions(termId: termId);
+    final out = <AttendanceRecord>[];
+    for (final s in sessions) {
+      out.addAll(await recordsFor(s.id));
+    }
+    return out;
+  }
+
+  Future<int> sessionCount(String termId) async =>
+      (await listSessions(termId: termId)).length;
+
+  Future<double> overallPct(String termId) async =>
+      pctFrom(await _recordsForTerm(termId));
+
+  Future<Map<AttendanceStatus, int>> statusCounts(String termId) async {
+    final records = await _recordsForTerm(termId);
+    return {
+      for (final s in AttendanceStatus.values)
+        s: records.where((r) => r.status == s).length,
+    };
   }
 
   Future<SessionWithStats> withStats(Session s) async {

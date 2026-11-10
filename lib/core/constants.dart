@@ -1,6 +1,16 @@
 import 'package:flutter/material.dart';
 
-enum ClubRole { admin, president, secretary, treasurer, teamLead, member }
+enum ClubRole {
+  admin,
+  president,
+  secretary,
+  treasurer,
+  organizer,
+  projectSupervisor,
+  logisticsOfficer,
+  headOfMediaOperations,
+  member,
+}
 
 enum MemberStatus { active, probation, alumni, suspended }
 
@@ -56,7 +66,10 @@ const Map<ClubRole, Set<Capability>> roleCapabilities = {
   },
   ClubRole.secretary: {Capability.members, Capability.attendance, Capability.viewAll},
   ClubRole.treasurer: {Capability.finance, Capability.viewAll},
-  ClubRole.teamLead: {Capability.attendance, Capability.viewAll},
+  ClubRole.organizer: {Capability.attendance, Capability.viewAll},
+  ClubRole.projectSupervisor: {Capability.attendance, Capability.viewAll},
+  ClubRole.logisticsOfficer: {Capability.viewAll},
+  ClubRole.headOfMediaOperations: {Capability.viewAll},
   ClubRole.member: {},
 };
 
@@ -64,9 +77,12 @@ extension ClubRoleX on ClubRole {
   String get label => switch (this) {
         ClubRole.admin => 'Patron',
         ClubRole.president => 'President',
-        ClubRole.secretary => 'Secretary',
-        ClubRole.treasurer => 'Treasurer',
-        ClubRole.teamLead => 'Team Lead',
+        ClubRole.secretary => 'General Secretary',
+        ClubRole.treasurer => 'Financial Secretary',
+        ClubRole.organizer => 'Organizer',
+        ClubRole.projectSupervisor => 'Project Supervisor',
+        ClubRole.logisticsOfficer => 'Logistics Officer',
+        ClubRole.headOfMediaOperations => 'Head of Media Operations',
         ClubRole.member => 'Member',
       };
 

@@ -330,6 +330,13 @@ class FinanceDao {
   }
 
   Future<double> collectionRate(String termId) async {
+    final charged = await termCharged(termId);
+    if (charged == 0) return 100;
+    final totals = await termTotals(termId);
+    return (totals.income * 100 / charged).clamp(0, 100);
+  }
+
+  Future<int> termCharged(String termId) async {
     final term = await (db.select(db.terms)..where((t) => t.id.equals(termId))).getSingle();
     final dues = await (db.select(db.memberDues)
           ..where((d) =>
@@ -337,10 +344,32 @@ class FinanceDao {
               d.createdAt.isBiggerOrEqualValue(term.startDate) &
               d.createdAt.isSmallerOrEqualValue('${term.endDate}T23:59:59')))
         .get();
-    final charged = dues.fold<int>(0, (s, d) => s + d.amountPesewas - d.waiverPesewas);
-    if (charged == 0) return 100;
-    final totals = await termTotals(termId);
-    return (totals.income * 100 / charged).clamp(0, 100);
+    return dues.fold<int>(0, (s, d) => s + d.amountPesewas - d.waiverPesewas);
+  }
+
+  Future<Map<PaymentMethod, int>> paymentsByMethod(String termId) async {
+    final payments = await (db.select(db.payments)
+          ..where((p) => p.termId.equals(termId) & p.deletedAt.isNull()))
+        .get();
+    return {
+      for (final m in PaymentMethod.values)
+        m: payments
+            .where((p) => p.method == m)
+            .fold<int>(0, (s, p) => s + p.amountPesewas),
+    };
+  }
+
+  Future<List<({String month, int total})>> monthlyCollections(String termId) async {
+    final payments = await (db.select(db.payments)
+          ..where((p) => p.termId.equals(termId) & p.deletedAt.isNull()))
+        .get();
+    final byMonth = <String, int>{};
+    for (final p in payments) {
+      final month = p.paidAt.substring(0, 7);
+      byMonth[month] = (byMonth[month] ?? 0) + p.amountPesewas;
+    }
+    final months = byMonth.keys.toList()..sort();
+    return [for (final m in months) (month: m, total: byMonth[m]!)];
   }
 
   Future<List<Defaulter>> defaulters() async {

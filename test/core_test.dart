@@ -164,5 +164,34 @@ void main() {
       expect(ClubRole.treasurer.can(Capability.finance), isTrue);
       expect(ClubRole.treasurer.can(Capability.admin), isFalse);
     });
+
+    test('the nine club roles are listed in order', () {
+      expect(ClubRole.values.map((r) => r.label).toList(), [
+        'Patron',
+        'President',
+        'General Secretary',
+        'Financial Secretary',
+        'Organizer',
+        'Project Supervisor',
+        'Logistics Officer',
+        'Head of Media Operations',
+        'Member',
+      ]);
+    });
+
+    test('officers below treasurer cannot manage finance or admin', () {
+      for (final r in [
+        ClubRole.organizer,
+        ClubRole.projectSupervisor,
+        ClubRole.logisticsOfficer,
+        ClubRole.headOfMediaOperations,
+      ]) {
+        expect(r.can(Capability.finance), isFalse, reason: r.label);
+        expect(r.can(Capability.admin), isFalse, reason: r.label);
+        expect(r.can(Capability.viewAll), isTrue, reason: r.label);
+      }
+      expect(ClubRole.organizer.can(Capability.attendance), isTrue);
+      expect(ClubRole.projectSupervisor.can(Capability.attendance), isTrue);
+    });
   });
 }

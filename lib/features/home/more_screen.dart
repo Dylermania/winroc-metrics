@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants.dart';
 import '../../core/strings.dart';
 import '../../providers.dart';
+import '../analytics/analytics_screen.dart';
 import '../communication/communication_screen.dart';
 import '../reports/reports_screen.dart';
 import '../robotics/robotics_screen.dart';
@@ -18,6 +19,7 @@ class MoreScreen extends ConsumerWidget {
     final user = ref.watch(currentUserProvider);
     final role = user?.role ?? ClubRole.member;
     final items = <(IconData, String, Widget, bool)>[
+      (Icons.insights_outlined, S.analytics, const AnalyticsScreen(), role.can(Capability.viewAll)),
       (Icons.picture_as_pdf_outlined, S.reports, const ReportsScreen(), role.can(Capability.viewAll)),
       (Icons.announcement_outlined, S.announcements, const AnnouncementsScreen(), true),
       (Icons.message_outlined, S.messageTemplates, const TemplatesScreen(), role.can(Capability.viewAll)),

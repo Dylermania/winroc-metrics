@@ -10,6 +10,7 @@ import '../../data/daos/finance_dao.dart';
 import '../../data/database.dart';
 import '../../providers.dart';
 import '../../shared/widgets.dart';
+import '../analytics/analytics_screen.dart';
 import '../attendance/attendance_screen.dart';
 import '../members/members_screen.dart';
 
@@ -43,6 +44,13 @@ class DashboardScreen extends ConsumerWidget {
               StatCard(S.netBalance, formatGhs(d.net), Icons.account_balance_outlined, color: d.net < 0 ? Colors.red : null),
               StatCard(S.clubHealth, '${d.health.toStringAsFixed(0)}%', Icons.favorite_outline, color: d.health < 50 ? Colors.red : Colors.green),
             ],
+          ),
+          const SizedBox(height: 16),
+          OutlinedButton.icon(
+            icon: const Icon(Icons.insights_outlined),
+            label: const Text(S.analytics),
+            onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const AnalyticsScreen())),
           ),
           const SizedBox(height: 16),
           Card(
@@ -277,7 +285,7 @@ final _dashboardProvider =
   final atRisk = termId == null ? <({Member member, double pct})>[] : await att.atRisk(threshold, termId);
   final defaulters = await fin.defaulters();
   final leaderboard = termId == null ? <({Member member, double pct, int sessions})>[] : await att.leaderboard(termId);
-  final upcoming = await att.watchSessions(upcomingOnly: true).first;
+  final upcoming = await att.listSessions(upcomingOnly: true);
   var avgPct = 100.0;
   if (trend.isNotEmpty) {
     avgPct = trend.map((t) => t.pct).reduce((a, b) => a + b) / trend.length;

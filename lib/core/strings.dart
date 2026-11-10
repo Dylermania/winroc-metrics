@@ -223,6 +223,17 @@ class S {
   static const attendanceTrend = 'Attendance trend';
   static const attendanceByTeam = 'Attendance by team';
 
+  static const analytics = 'Analytics & Metrics';
+  static const overallAttendance = 'Overall attendance';
+  static const sessionsHeld = 'Sessions held';
+  static const statusDistribution = 'Attendance breakdown';
+  static const expected = 'Expected';
+  static const outstanding = 'Outstanding';
+  static const paymentMethods = 'Payment methods';
+  static const monthlyCollections = 'Monthly collections';
+  static const recordsMarked = 'records marked';
+  static const noDataForTerm = 'No data for this term yet.';
+
   static const sync = 'Device sync';
   static const syncHint =
       'Sync this device with another over local Wi-Fi. No internet needed. One device hosts, the other connects using the address shown.';

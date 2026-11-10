@@ -57,7 +57,7 @@ class NotificationService {
     try {
       final now = DateTime.now();
       final today = dateOnly(now);
-      final sessions = await attendance.watchSessions(upcomingOnly: true).first;
+      final sessions = await attendance.listSessions(upcomingOnly: true);
       for (final s in sessions) {
         if (s.date != today) continue;
         final start = DateTime.tryParse('${s.date}T${s.startTime}');
